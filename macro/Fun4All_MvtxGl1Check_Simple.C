@@ -32,11 +32,12 @@ R__LOAD_LIBRARY(librawdatatools.so)
 R__LOAD_LIBRARY(libMvtxGl1Check.so)
 
 void Fun4All_MvtxGl1Check_Simple(const int iflx,
-                                const int nEvents = 10000)
+                                const int nEvents = 10000
+                                )
 {  
     
-    const std::string output_name = "/sphenix/user/tmengel/MVTX/mvtx-gl1-check/rootfiles/00045252_physics/gl1_check_mvtx" + std::to_string(iflx) + "_" + std::to_string(nEvents) + ".root";
-    const int run_number=45252;
+    const std::string output_name = "/sphenix/user/tmengel/MVTX/mvtx-gl1-check/rootfiles/00045393_physics/gl1_check_dbco_100_mvtx" + std::to_string(iflx) + "_" + std::to_string(nEvents) + ".root";
+    const int run_number=45393;
     const std::string run_type="physics";
 
     // raw data manager
@@ -71,8 +72,8 @@ void Fun4All_MvtxGl1Check_Simple(const int iflx,
     }
 
     SingleMvtxPoolInput  * mvtx_sngl = new SingleMvtxPoolInput("MVTX_FLX" + to_string(iflx));
-    mvtx_sngl->SetBcoRange(1000);
-    mvtx_sngl->SetNegativeBco(1000);
+    mvtx_sngl->SetBcoRange(100);
+    mvtx_sngl->SetNegativeBco(100);
     std::vector<std::string> mvtx_files = rdm->GetFiles(RawDataDefs::MVTX, RawDataDefs::get_channel_name(RawDataDefs::MVTX, iflx));
     std::cout << "Adding files for flx " << iflx << std::endl;
     for (const auto &infile : mvtx_files)

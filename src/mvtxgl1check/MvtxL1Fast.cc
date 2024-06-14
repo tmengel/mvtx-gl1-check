@@ -12,6 +12,8 @@
 #include <ffarawobjects/Gl1RawHitv2.h>
 #include <ffarawobjects/MvtxRawEvtHeader.h>
 #include <ffarawobjects/MvtxRawEvtHeaderv1.h>
+#include <ffarawobjects/MvtxRawHitContainer.h>
+#include <ffarawobjects/MvtxRawHitContainerv1.h>
 
 #include <trackbase/MvtxDefs.h>
 #include <trackbase/TrkrDefs.h>
@@ -54,6 +56,7 @@ int MvtxL1Fast::InitRun(PHCompositeNode* /*topNode*/)
     m_tree->Branch("gl1_bco", &m_gl1_bco);
     m_tree->Branch("n_l1s", &m_n_l1s, "n_l1s/I");
     m_tree->Branch("mvtx_lls", &m_mvtx_lls);
+    m_tree->Branch("nhits", &m_n_no_hits, "nhits/I");
     // m_tree->Branch("n_strobe_bcos", &m_n_strobe_bcos, "n_strobe_bcos/I");
     // m_tree->Branch("strobe_bcos", &m_strobe_bcos);
     // m_tree->Branch("n_l1_bcos", &m_n_l1_bcos, "n_l1_bcos/I");
@@ -86,30 +89,16 @@ int MvtxL1Fast::process_event(PHCompositeNode *topNode)
     m_gl1_sequence = m_gl1_raw_hit->getEvtSequence();
     m_gl1_bco.push_back(gl1_bco);
 
+    MvtxRawHitContainerv1 *m_mvtx_raw_hit_container = findNode::getClass<MvtxRawHitContainerv1>(topNode, "MVTXRAWHIT");
+    if (!m_mvtx_raw_hit_container){ std::cout << PHWHERE << "::" << __func__ << ": Could not get MVTXRAWHIT from Node Tree" << std::endl; exit(1); }
+    if(Verbosity() > 2) {  m_mvtx_raw_hit_container->identify();  }
+
+
     // get dst nodes
     MvtxRawEvtHeaderv1 * m_mvtx_raw_event_header = findNode::getClass<MvtxRawEvtHeaderv1>(topNode, "MVTXRAWEVTHEADER");
     if(!m_mvtx_raw_event_header){ std::cout << PHWHERE << "::" << __func__ << ": Could not get MVTXRAWEVTHEADER from Node Tree" << std::endl; exit(1); }
 
-    // MvtxEventInfov2* mvtx_event_header = findNode::getClass<MvtxEventInfov2>(topNode, "MVTXEVENTHEADER");
-    // if (!mvtx_event_header)
-    // {
-    //   std::cout << __FILE__ << "::" << __func__ << " - MVTXEVENTHEADER missing, doing nothing." << std::endl;
-    //   exit(1);
-    // }
-
-    // std::set<uint64_t> strobeList = mvtx_event_header->get_strobe_BCOs();
-    // for (auto iterStrobe = strobeList.begin(); iterStrobe != strobeList.end(); ++iterStrobe)
-    // {
-    //   m_strobe_bcos.push_back(*iterStrobe);
-    //   m_n_strobe_bcos++;
-    //   std::set<uint64_t> l1List = mvtx_event_header->get_L1_BCO_from_strobe_BCO(*iterStrobe);
-    //   for (auto iterL1 = l1List.begin(); iterL1 != l1List.end(); ++iterL1)
-    //   {
-    //     m_l1_bcos.push_back(static_cast<double>(*iterL1));
-    //     m_n_l1_bcos++;
-    //   }
-    // }
-
+    m_n_no_hits = m_mvtx_raw_hit_container->get_nhits();
 
     std::set<uint64_t> mvtx_l1s = m_mvtx_raw_event_header->getMvtxLvL1BCO();
     m_n_l1s = mvtx_l1s.size();
@@ -120,8 +109,6 @@ int MvtxL1Fast::process_event(PHCompositeNode *topNode)
     m_tree->Fill();
 
     m_total_n_l1s+=m_n_l1s;
-    // m_total_n_strobe_bcos+=m_n_strobe_bcos;
-    // m_total_n_l1_bcos+=m_n_l1_bcos;
 
     return Fun4AllReturnCodes::EVENT_OK;
 }

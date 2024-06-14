@@ -47,6 +47,8 @@ class MvtxL1Fast : public SubsysReco
         int m_n_l1_bcos{0};
         std::vector<uint64_t> m_l1_bcos{};
 
+        int m_n_no_hits{0};
+
         int m_total_n_l1s{0};
         int m_total_n_strobe_bcos{0};
         int m_total_n_l1_bcos{0};
